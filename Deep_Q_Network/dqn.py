@@ -1,7 +1,7 @@
 import gym
 import numpy as np
 import tensorflow as tf
-from buffer import *
+from memory import *
 
 
 initializer_helper = {
@@ -16,11 +16,11 @@ class DQN(object):
         self.s_dim = s_dim  # 状态维度
         self.a_dim = a_dim  # one hot行为维度
         self.gamma = gamma
-        self.lr = lr # learning rate
+        self.lr = lr  # learning rate
         self.epsilon = epsilon  # epsilon-greedy
         self.replace_target_iter = replace_target_iter  # 经历C步后更新target参数
 
-        self.buffer = Buffer(batch_size, 10000)
+        self.memory = Memory(batch_size, 10000)
         self._learn_step_counter = 0
         self._generate_model()
 
@@ -74,12 +74,12 @@ class DQN(object):
         one_hot_action = np.zeros(self.a_dim)
         one_hot_action[a] = 1
 
-        self.buffer.store_transition(s, one_hot_action, [r], s_, [done])
+        self.memory.store_transition(s, one_hot_action, [r], s_, [done])
         self._learn()
         self._learn_step_counter += 1
 
     def _learn(self):
-        s, a, r, s_, done = self.buffer.get_mini_batches()
+        s, a, r, s_, done = self.memory.get_mini_batches()
 
         loss, _ = self.sess.run([self.loss, self.optimizer], feed_dict={
             self.s: s,

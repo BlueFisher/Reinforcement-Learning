@@ -3,7 +3,7 @@ import random
 import numpy as np
 
 # 记忆库
-class Buffer(object):
+class Memory(object):
     def __init__(self, batch_size, max_size):
         self.batch_size = batch_size # mini batch大小
         self.max_size = max_size
