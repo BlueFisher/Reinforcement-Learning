@@ -1,6 +1,5 @@
 import numpy as np
 import tensorflow as tf
-import random
 import gym
 
 
@@ -14,23 +13,26 @@ class Actor(object):
     def __init__(self, sess, s_dim, a_bound, lr):
         self.sess = sess
 
-        self.s = tf.placeholder(tf.float32, shape=(1, s_dim), name='state')
-        self.a = tf.placeholder(tf.float32, shape=(), name='action')
+        self.s = tf.placeholder(tf.float32, shape=(1, s_dim), name='s')
+        self.a = tf.placeholder(tf.float32, shape=(), name='a')
         self.td_error = tf.placeholder(tf.float32, shape=(), name='td_error')
 
         l1 = tf.layers.dense(inputs=self.s, units=30, activation=tf.nn.relu, **initializer_helper)
 
+        # 均值
         mu = tf.layers.dense(inputs=l1, units=1, activation=tf.nn.tanh, **initializer_helper)
+        # 方差
         sigma = tf.layers.dense(inputs=l1, units=1, activation=tf.nn.softplus, **initializer_helper)
 
-        mu, sigma = tf.squeeze(mu * a_bound), tf.squeeze(sigma + 0.1)
+        # 均值控制在(-2, 2) 方差控制在(0, 2)
+        mu, sigma = tf.squeeze(mu * a_bound), tf.squeeze(sigma + 1)
 
         self.normal_dist = tf.distributions.Normal(mu, sigma)
         self.action = tf.clip_by_value(self.normal_dist.sample(1), -a_bound, a_bound)
 
         loss = self.normal_dist.log_prob(self.a) * self.td_error
-        # loss += 0.01 * self.normal_dist.entropy()
 
+        # 最大化 J，即最小化 -loss
         self.optimizer = tf.train.AdamOptimizer(lr).minimize(-loss)
 
     def learn(self, s, a, td_error):
@@ -46,6 +48,7 @@ class Actor(object):
         }).squeeze()
 
 
+# 与 actor_critic_cartpole.py 中 Critic 相同
 class Critic(object):
     def __init__(self, sess, s_dim, gamma, lr):
         self.sess = sess
@@ -58,8 +61,6 @@ class Critic(object):
             inputs=self.s, units=30,
             activation=tf.nn.relu, **initializer_helper
         )
-
-        self.v = tf.layers.dense(l, 1, **initializer_helper)
 
         self.v = tf.layers.dense(
             inputs=l, units=1, **initializer_helper
