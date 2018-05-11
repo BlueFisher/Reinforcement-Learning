@@ -97,7 +97,7 @@ with tf.Session() as sess:
     critic = Critic(
         sess=sess,
         s_dim=4,
-        gamma=0.99,
+        gamma=0.9,
         lr=0.001
     )
 
