@@ -1,8 +1,5 @@
-import gym
 import numpy as np
 import tensorflow as tf
-import random
-import collections
 
 initializer_helper = {
     'kernel_initializer': tf.random_normal_initializer(0., 0.1),
@@ -10,32 +7,9 @@ initializer_helper = {
 }
 
 
-class Buffer(object):
-    def __init__(self, batch_size, max_size):
-        self.batch_size = batch_size
-        self.max_size = max_size
-        self.isFull = False
-        self._transition_store = collections.deque()
-
-    def store_transition(self, s, a, r, s_):
-        if len(self._transition_store) == self.max_size:
-            self._transition_store.popleft()
-
-        self._transition_store.append((s, a, r, s_))
-        if len(self._transition_store) == self.max_size:
-            self.isFull = True
-
-    def get_mini_batches(self):
-        n_sample = self.batch_size if len(self._transition_store) >= self.batch_size else len(self._transition_store)
-        t = random.sample(self._transition_store, k=n_sample)
-        t = list(zip(*t))
-
-        return tuple(np.array(e) for e in t)
-
-
 class Actor(object):
     def __init__(self, sess, s_dim, a_bound, lr, tau):
-        self.sess = sess
+        self.sess = sess 
         self.s_dim = s_dim
         self.a_bound = a_bound
         self.lr = lr
@@ -50,6 +24,7 @@ class Actor(object):
         self.param_eval = tf.global_variables('actor/eval')
         self.param_target = tf.global_variables('actor/target')
 
+        # soft update
         self.target_replace_ops = [tf.assign(t, tau * e + (1 - tau) * t) for t, e in zip(self.param_target, self.param_eval)]
 
     def _build_net(self, s, scope, trainable):
@@ -74,9 +49,8 @@ class Actor(object):
         return a[0]
 
     def generate_gradients(self, Q_a_gradients):
+        # 根据链式法则，生成 Actor 的梯度
         grads = tf.gradients(self.a, self.param_eval, Q_a_gradients)
-        # grads = tf.reduce_mean(grads)
-        print(grads)
         optimizer = tf.train.AdamOptimizer(-self.lr)
         self.train_ops = optimizer.apply_gradients(zip(grads, self.param_eval))
 
@@ -102,9 +76,11 @@ class Critic(object):
 
         param_eval = tf.global_variables('critic/eval')
         param_target = tf.global_variables('critic/target')
+        # soft update
         self.target_replace_ops = [tf.assign(t, tau * e + (1 - tau) * t)
                                    for t, e in zip(param_target, param_eval)]
 
+        # y_i
         target_q = self.r + gamma * self.q_
 
         loss = tf.reduce_mean(tf.squared_difference(target_q, self.q))
@@ -127,6 +103,7 @@ class Critic(object):
                 q = tf.layers.dense(l, 1, name='q', trainable=trainable, **initializer_helper)
         return q
 
+    # 生成 Q 对 a 的导数，交给 actor
     def get_gradients(self):
         return tf.gradients(self.q, self.a)[0]
 
@@ -138,47 +115,3 @@ class Critic(object):
             self.s_: s_,
         })
         self.sess.run(self.target_replace_ops)
-
-
-env = gym.make('Pendulum-v0')
-env = env.unwrapped
-
-state_dim = env.observation_space.shape[0]
-action_dim = env.action_space.shape[0]
-action_bound = env.action_space.high
-
-
-var = 3.
-
-with tf.Session() as sess:
-    buffer = Buffer(32, 10000)
-    actor = Actor(sess, state_dim, action_bound, lr=0.01, tau=0.01)
-    critic = Critic(sess, state_dim, actor.s, actor.s_, actor.a, actor.a_, gamma=0.9, lr=0.001, tau=0.01)
-    t = critic.get_gradients()
-
-    actor.generate_gradients(t)
-
-    sess.run(tf.global_variables_initializer())
-
-    for i in range(1000):
-        s = env.reset()
-        r_episode = 0
-        for j in range(200):
-            a = actor.choose_action(s)
-            a = np.clip(np.random.normal(a, var), -action_bound, action_bound)
-            s_, r, done, info = env.step(a)
-
-            buffer.store_transition(s, a, [r / 10], s_)
-
-            if buffer.isFull:
-                var *= 0.9995
-                b_s, b_a, b_r, b_s_ = buffer.get_mini_batches()
-                critic.learn(b_s, b_a, b_r, b_s_)
-                actor.learn(b_s)
-
-            r_episode += r
-            s = s_
-
-            if(j == 200 - 1):
-                print('episode {}\treward {:.2f}\tvar {:.2f}'.format(i, r_episode, var))
-                break
