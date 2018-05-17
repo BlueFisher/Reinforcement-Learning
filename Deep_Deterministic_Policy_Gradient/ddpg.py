@@ -80,8 +80,10 @@ class Critic(object):
         self.target_replace_ops = [tf.assign(t, tau * e + (1 - tau) * t)
                                    for t, e in zip(param_target, param_eval)]
 
-        # y_i
+        # y_t
         target_q = self.r + gamma * self.q_
+        # 可以保留或忽略 target_q 的梯度
+        target_q = tf.stop_gradient(target_q)
 
         loss = tf.reduce_mean(tf.squared_difference(target_q, self.q))
         self.train_ops = tf.train.AdamOptimizer(lr).minimize(loss, var_list=param_eval)
