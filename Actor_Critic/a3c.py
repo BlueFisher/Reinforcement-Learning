@@ -39,6 +39,7 @@ class Global_net(object):
             return mu, sigma, v, a_params, c_params
 
 
+# 独立线程，actor critic 合并
 class Worker_net(object):
     def __init__(self, global_net, name):
         self.g = global_net
@@ -53,6 +54,9 @@ class Worker_net(object):
         critic_loss = tf.reduce_mean(tf.square(td))
 
         self.normal_dist = tf.distributions.Normal(mu, sigma)
+        obj = self.normal_dist.log_prob(self.a) * tf.stop_gradient(td)
+        # 加上策略的熵增加探索空间，避免过早进入局部最优
+        obj = obj + self.normal_dist.entropy()
         actor_loss = -tf.reduce_mean(self.normal_dist.log_prob(self.a) * tf.stop_gradient(td))
 
         self._choose_a_ops = tf.squeeze(tf.clip_by_value(self.normal_dist.sample(1),
@@ -61,6 +65,7 @@ class Worker_net(object):
         self.a_grads = tf.gradients(actor_loss, self.a_params)
         self.c_grads = tf.gradients(critic_loss, self.c_params)
 
+        # 用自己的梯度来更新全局参数
         self.update_a_op = tf.train.RMSPropOptimizer(self.g.actor_lr).apply_gradients(zip(self.a_grads, self.g.a_params))
         self.update_c_op = tf.train.RMSPropOptimizer(self.g.critic_lr).apply_gradients(zip(self.c_grads, self.g.c_params))
 
@@ -72,10 +77,12 @@ class Worker_net(object):
             self.g.s: s[np.newaxis, :]
         })
 
+    # 从全局下载参数替换子线程中的参数
     def _sync(self):
         self.g.sess.run(self.sync_a_ops)
         self.g.sess.run(self.sync_c_ops)
 
+    # 在子线程中进行学习，并将子线程的参数更新到全局
     def _update(self, done, transition):
         if done:
             R = 0
@@ -101,6 +108,7 @@ class Worker_net(object):
             self.R: buffer_R
         })
 
+    # 子线程模拟自己独有的环境
     def run(self):
         env = gym.make('Pendulum-v0')
         env = env.unwrapped
@@ -134,40 +142,27 @@ class Worker_net(object):
 
 sess = tf.Session()
 
-with tf.device("/cpu:0"):
-    global_net = Global_net(
-        sess=sess,
-        s_dim=3,
-        a_bound=2,
-        gamma=0.9,
-        actor_lr=0.0001,
-        critic_lr=0.001,
-        max_global_ep=1000,
-        max_ep_steps=200,
-        update_iter=10
-    )
-    workers = [Worker_net(global_net, 'w' + str(i)) for i in range(4)]
-# work = Worker_net(global_net, 'worker1')
-# work.run()
 
+global_net = Global_net(
+    sess=sess,
+    s_dim=3,
+    a_bound=2,
+    gamma=0.9,
+    actor_lr=0.0001,
+    critic_lr=0.001,
+    max_global_ep=1000,
+    max_ep_steps=200,
+    update_iter=10
+)
 
-COORD = tf.train.Coordinator()
+THREAD_N = 4
+
+workers = [Worker_net(global_net, 'w' + str(i)) for i in range(THREAD_N)]
+
 sess.run(tf.global_variables_initializer())
 
-# executor = concurrent.futures.ThreadPoolExecutor(4)
-# futures = [executor.submit(w.run) for w in workers]
-# concurrent.futures.wait(futures)
-# for f in futures:
-#     f.result()
-
-worker_threads = []
-for worker in workers:
-    def job(): return worker.run()
-    t = threading.Thread(target=job)
-    t.start()
-    worker_threads.append(t)
-COORD.join(worker_threads)
-
-# e = executor.submit(work.run)
-
-# concurrent.futures.as_completed(e)
+executor = concurrent.futures.ThreadPoolExecutor(THREAD_N)
+futures = [executor.submit(w.run) for w in workers]
+concurrent.futures.wait(futures)
+for f in futures:
+    f.result()
