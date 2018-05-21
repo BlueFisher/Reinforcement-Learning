@@ -44,7 +44,8 @@ class DQN(object):
         self.q_target_z = self._build_net(self.s_, 'target_net', False)
 
         # y = r + gamma * max(q^)
-        q_target = self.r + self.gamma * tf.reduce_max(self.q_target_z, axis=1, keepdims=True) * (1 - self.done)
+        q_target = self.r + self.gamma \\
+            * tf.reduce_max(self.q_target_z, axis=1, keepdims=True) * (1 - self.done)
 
         q_eval = tf.reduce_sum(self.a * self.q_eval_z, axis=1, keepdims=True)
         # a_mask = tf.cast(self.a, tf.bool)
