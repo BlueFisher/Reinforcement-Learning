@@ -7,7 +7,7 @@ from sum_tree import SumTree
 class Memory(object):
     def __init__(self, batch_size, max_size, beta):
         self.batch_size = batch_size  # mini batch大小
-        self.max_size = 2**math.floor(math.log2(max_size))
+        self.max_size = 2**math.floor(math.log2(max_size)) # 保证 sum tree 为完全二叉树
         self.beta = beta
 
         self._sum_tree = SumTree(max_size)
@@ -28,6 +28,7 @@ class Memory(object):
 
         points, transitions, probs = zip(*points_transitions_probs)
 
+        # 计算重要性比率
         max_impmortance_ratio = (n_sample * self._sum_tree.get_min())**-self.beta
         importance_ratio = [(n_sample * probs[i])**-self.beta / max_impmortance_ratio
                             for i in range(len(probs))]
