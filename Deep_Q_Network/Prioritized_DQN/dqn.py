@@ -20,7 +20,7 @@ class DQN(object):
         self.epsilon = epsilon  # epsilon-greedy
         self.replace_target_iter = replace_target_iter  # 经历C步后更新target参数
 
-        self.memory = Memory(batch_size, 10000)
+        self.memory = Memory(batch_size, 16384, 0.9)
         self._learn_step_counter = 0
         self._generate_model()
 
@@ -40,6 +40,8 @@ class DQN(object):
         self.s_ = tf.placeholder(tf.float32, shape=(None, self.s_dim), name='s_')
         self.done = tf.placeholder(tf.float32, shape=(None, 1), name='done')
 
+        self.importance_ratio = tf.placeholder(tf.float32, shape=(None, 1), name='importance_ratio')
+
         self.q_eval_z = self._build_net(self.s, 'eval_net', True)
         self.q_target_z = self._build_net(self.s_, 'target_net', False)
 
@@ -54,7 +56,9 @@ class DQN(object):
 
         q_eval = tf.reduce_sum(self.a * self.q_eval_z, axis=1, keepdims=True)
 
-        self.loss = tf.reduce_mean(tf.squared_difference(q_target, q_eval))
+        self.td_error = tf.abs(q_target - q_eval)
+
+        self.loss = tf.reduce_mean(tf.squared_difference(q_target, q_eval)) * self.importance_ratio
         self.optimizer = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
 
         param_target = tf.global_variables(scope='target_net')
@@ -83,12 +87,15 @@ class DQN(object):
         self._learn_step_counter += 1
 
     def _learn(self):
-        s, a, r, s_, done = self.memory.get_mini_batches()
+        points, (s, a, r, s_, done), importance_ratio = self.memory.get_mini_batches()
 
-        loss, _ = self.sess.run([self.loss, self.optimizer], feed_dict={
+        td_error, _ = self.sess.run([self.td_error, self.optimizer], feed_dict={
             self.s: s,
             self.a: a,
             self.r: r,
             self.s_: s_,
-            self.done: done
+            self.done: done,
+            self.importance_ratio: np.array([importance_ratio]).T
         })
+
+        self.memory.update(points, td_error.squeeze(axis=1))

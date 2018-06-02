@@ -66,7 +66,10 @@ class DQN(object):
     def _build_net(self, s, scope, trainable):
         with tf.variable_scope(scope):
             l = tf.layers.dense(s, 20, activation=tf.nn.relu, trainable=trainable, ** initializer_helper)
-            q_z = tf.layers.dense(l, self.a_dim, trainable=trainable, **initializer_helper)
+            v_z = tf.layers.dense(l, 1, trainable=trainable, **initializer_helper)
+            a_z = tf.layers.dense(l, self.a_dim, trainable=trainable, **initializer_helper)
+
+            q_z = v_z + a_z - tf.reduce_max(a_z)
 
         return q_z
 
