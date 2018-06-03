@@ -1,11 +1,19 @@
-[Deep Q-Network](https://bluefisher.github.io/2018/05/07/Deep-Q-Network/), [DQN Code](https://bluefisher.github.io/2018/05/08/DQN-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
-
-[Double DQN & Code](https://bluefisher.github.io/2018/05/21/Double-DQN-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
-
-[Policy Gradient](https://bluefisher.github.io/2018/05/10/%E7%AD%96%E7%95%A5%E6%A2%AF%E5%BA%A6-Policy-Gradient/), [Actor-Critic Code](https://bluefisher.github.io/2018/05/10/Actor-Critic-Softmax-Gaussian-Policy-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
-
-[Determinitic Policy Gradient](https://bluefisher.github.io/2018/05/16/%E7%A1%AE%E5%AE%9A%E6%80%A7%E7%AD%96%E7%95%A5%E6%A2%AF%E5%BA%A6-Deterministic-Policy-Gradient/)
-
-[Deep Deterministic Policy Gradient](https://bluefisher.github.io/2018/05/16/Deep-Deterministic-Policy-Gradient/), [DDPG Code](https://bluefisher.github.io/2018/05/17/DDPG-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
-
-[Asynchronous Methods for Deep Reinforcement Learning](https://bluefisher.github.io/2018/05/17/Asynchronous-Methods-for-Deep-Reinforcement-Learning/), [A3C Code](https://bluefisher.github.io/2018/05/18/A3C-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
+1. [马尔可夫决策过程(MDP)定义整理](https://bluefisher.github.io/2018/05/07/%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E5%86%B3%E7%AD%96%E8%BF%87%E7%A8%8B-MDP-%E5%AE%9A%E4%B9%89%E6%95%B4%E7%90%86/)
+2. [基于模型的动态规划 Planning by Dynamic Programming](https://bluefisher.github.io/2018/05/19/%E5%9F%BA%E4%BA%8E%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92-Planning-by-Dynamic-Programming/)
+3. [无模型预测 Model-Free Predication](https://bluefisher.github.io/2018/05/19/%E6%97%A0%E6%A8%A1%E5%9E%8B%E9%A2%84%E6%B5%8B-Model-Free-Predication/)
+4. [无模型控制 Model-Free Control](https://bluefisher.github.io/2018/05/22/%E6%97%A0%E6%A8%A1%E5%9E%8B%E6%8E%A7%E5%88%B6-Model-Free-Control/)
+5. [值函数近似 Value Function Approximation](https://bluefisher.github.io/2018/05/26/%E5%80%BC%E5%87%BD%E6%95%B0%E8%BF%91%E4%BC%BC-Value-Function-Approximation/)
+   1. [Deep Q-Network](https://bluefisher.github.io/2018/05/07/Deep-Q-Network/)
+   2. [DQN 代码实现](https://bluefisher.github.io/2018/05/08/DQN-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
+   3. [Double DQN & 代码实现](https://bluefisher.github.io/2018/05/21/Double-DQN-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
+   4. [Prioritized Experience Replay](https://bluefisher.github.io/2018/05/25/Prioritized-Experience-Replay/)
+   5. [Prioritized Experience Replay 代码实现](https://bluefisher.github.io/2018/06/02/Prioritized-Experience-Replay-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
+   6. [Dueling Network Architectures for Deep Reinforcement Learning & 代码实现](https://bluefisher.github.io/2018/06/03/Dueling-Network-Architectures-for-Deep-Reinforcement-Learning/)
+6. [策略梯度 Policy Gradient](https://bluefisher.github.io/2018/05/10/%E7%AD%96%E7%95%A5%E6%A2%AF%E5%BA%A6-Policy-Gradient/)
+   1. [Actor-Critic Softmax & Gaussian Policy 代码实现](https://bluefisher.github.io/2018/05/10/Actor-Critic-Softmax-Gaussian-Policy-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
+   2. [Deterministic Policy Gradient](https://bluefisher.github.io/2018/05/16/Deterministic-Policy-Gradient/)
+   3. [Deep Deterministic Policy Gradient](https://bluefisher.github.io/2018/05/16/Deep-Deterministic-Policy-Gradient/)
+   4. [DDPG 代码实现](https://bluefisher.github.io/2018/05/17/DDPG-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
+   5. [Asynchronous Methods for Deep Reinforcement Learning](https://bluefisher.github.io/2018/05/17/Asynchronous-Methods-for-Deep-Reinforcement-Learning/)
+   6. [A3C 代码实现](https://bluefisher.github.io/2018/05/18/A3C-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
+7. [整合学习与规划 Integrating Learning and Planning](https://bluefisher.github.io/2018/05/29/%E6%95%B4%E5%90%88%E5%AD%A6%E4%B9%A0%E4%B8%8E%E8%A7%84%E5%88%92-Integrating-Learning-and-Planning/)
