@@ -8,7 +8,7 @@
    3. [Double DQN & 代码实现](https://bluefisher.github.io/2018/05/21/Double-DQN-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
    4. [Prioritized Experience Replay](https://bluefisher.github.io/2018/05/25/Prioritized-Experience-Replay/)
    5. [Prioritized Experience Replay 代码实现](https://bluefisher.github.io/2018/06/02/Prioritized-Experience-Replay-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
-   6. [Dueling Network Architectures for Deep Reinforcement Learning & 代码实现](https://bluefisher.github.io/2018/06/03/Dueling-Network-Architectures-for-Deep-Reinforcement-Learning/)
+   6. [Dueling Network Architectures for Deep Reinforcement Learning & 代码实现](https://bluefisher.github.io/2018/06/03/Dueling-Network-Architectures-for-Deep-Reinforcement-Learning-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
 6. [策略梯度 Policy Gradient](https://bluefisher.github.io/2018/05/10/%E7%AD%96%E7%95%A5%E6%A2%AF%E5%BA%A6-Policy-Gradient/)
    1. [Actor-Critic Softmax & Gaussian Policy 代码实现](https://bluefisher.github.io/2018/05/10/Actor-Critic-Softmax-Gaussian-Policy-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/)
    2. [Deterministic Policy Gradient](https://bluefisher.github.io/2018/05/16/Deterministic-Policy-Gradient/)
