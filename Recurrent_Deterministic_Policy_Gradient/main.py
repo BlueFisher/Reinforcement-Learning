@@ -15,16 +15,16 @@ if __name__ == '__main__':
     action_dim = env.action_space.shape[0]
     action_bound = env.action_space.high
 
-    var = 1.
-    BATCH_SIZE = 32
+    var = 3.
+    BATCH_SIZE = 10
     LEN_EPISODE = 200
 
     with tf.Session() as sess:
         memory = Memory(BATCH_SIZE, 64)
         actor = Actor(sess, state_dim, action_dim, action_bound,
-                      batch_size=BATCH_SIZE, lr=0.001, tau=0.01)
+                      lr=0.001, tau=0.01)
         critic = Critic(sess, state_dim, action_dim, actor.s, actor.a, actor.s_, actor.a_,
-                        batch_size=BATCH_SIZE, gamma=0.9, lr=0.001, tau=0.01)
+                        batch_size=actor.batch_size, gamma=0.9, lr=0.001, tau=0.01)
         actor.generate_gradients(critic.get_gradients())
 
         sess.run(tf.global_variables_initializer())
@@ -41,12 +41,12 @@ if __name__ == '__main__':
                 s_, r, *_ = env.step(a)
                 b_s.append(s)
                 b_a.append(a)
-                b_r.append([(r + 8)*100])
+                b_r.append([(r + 8)])
                 b_s_.append(s_)
 
                 r_episode += r
                 s = s_
-                
+
             if memory.isFull:
                 var *= 0.9995
             memory.store_transition(b_s, b_a, b_r, b_s_)

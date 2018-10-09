@@ -8,16 +8,15 @@ initializer_helper = {
 
 
 class Actor(object):
-    def __init__(self, sess, s_dim, a_dim, a_bound, batch_size, lr, tau):
+    def __init__(self, sess, s_dim, a_dim, a_bound, lr, tau):
         self.sess = sess
         self.s_dim = s_dim
         self.a_dim = a_dim
         self.a_bound = a_bound
-        self.train_batch_size = batch_size
         self.lr = lr
 
         with tf.variable_scope('actor'):
-            self.batch_size = tf.placeholder_with_default(batch_size, shape=[], name='batch_size')
+            self.batch_size = tf.placeholder(tf.int32, shape=[], name='batch_size')
             self.s = tf.placeholder(tf.float32, shape=(None, None, s_dim), name='state')
             self.s_ = tf.placeholder(tf.float32, shape=(None, None, s_dim), name='state_')
 
@@ -77,7 +76,7 @@ class Actor(object):
     def learn(self, s):
         self.sess.run(self.train_op, {
             self.s: s,
-            self.batch_size: self.train_batch_size
+            self.batch_size: s.shape[0]
         })
         self.sess.run(self.target_replace_op)
 
@@ -90,7 +89,7 @@ class Critic(object):
         self.s = s
         self.a = a
         self.s_ = s_
-        self.batch_size = batch_size
+        self.batch_size=batch_size
 
         with tf.variable_scope('critic'):
             # (batch_size, num_steps, 1)
@@ -149,7 +148,8 @@ class Critic(object):
             self.s: s,
             self.a: a,
             self.r: r,
-            self.s_: s_
+            self.s_: s_,
+            self.batch_size: s.shape[0]
         })
 
     def replace(self):
