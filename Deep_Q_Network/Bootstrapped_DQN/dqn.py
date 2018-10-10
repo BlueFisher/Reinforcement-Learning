@@ -70,7 +70,8 @@ class DQN(object):
             q_z_arr = []
             for i in range(self.headers_K):
                 with tf.variable_scope(f'header_{i}'):
-                    q_z_arr.append(tf.layers.dense(l, self.a_dim, trainable=trainable, **initializer_helper))
+                    t = tf.layers.dense(l, 20,activation=tf.nn.relu, trainable=trainable, **initializer_helper)
+                    q_z_arr.append(tf.layers.dense(t, self.a_dim, trainable=trainable, **initializer_helper))
 
         return q_z_arr
 
@@ -89,7 +90,7 @@ class DQN(object):
     def _learn(self):
         s, a, r, s_, done = self.memory.get_mini_batches()
         # 所有 header 一起学习
-        loss,_ = self.sess.run([self.loss_arr, self.optimizer_arr], feed_dict={
+        loss, _ = self.sess.run([self.loss_arr, self.optimizer_arr], feed_dict={
             self.s: s,
             self.a: a,
             self.r: r,
